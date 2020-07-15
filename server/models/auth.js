@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 const crypto = require("crypto");
 
-const UserSchema = new mongoose.Schema(
+const UserSchema = new Schema(
   {
     name: {
       type: String,
@@ -74,4 +74,4 @@ UserSchema.virtual("password")
     return this._password;
   });
 
-module.exports = mongoose("User", UserSchema);
+module.exports = model("User", UserSchema);

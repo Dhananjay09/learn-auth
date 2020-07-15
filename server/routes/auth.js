@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const { signUp } = require("../controllers/auth");
 
-router.post("/signup", (__, res) => res.json({ welcome: "Sign up" }));
+router.post("/signup", signUp);
 
 router.post("/account-activation", (__, res) =>
   res.json({ welcome: "Welcome" })
