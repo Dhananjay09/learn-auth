@@ -1,14 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { signUp } = require("../controllers/auth");
+const { signUp, signIn, activateAccount } = require("../controllers/auth");
 
 router.post("/signup", signUp);
 
-router.post("/account-activation", (__, res) =>
-  res.json({ welcome: "Welcome" })
-);
+router.post("/account-activation", activateAccount);
 
-router.post("/signin", (__, res) => res.json({ welcome: "Sign In" }));
+router.post("/signin", signIn);
 
 router.post("/forgot-password", (__, res) =>
   res.json({ welcome: "Forgot Password" })

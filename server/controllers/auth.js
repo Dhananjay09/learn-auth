@@ -78,3 +78,53 @@ exports.signUp = (req, res) => {
     });
   });
 };
+
+exports.activateAccount = (req, res) => {
+  const { token } = req.body;
+
+  if (token) {
+    return jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, (err) => {
+      if (err) {
+        return res.status(401).json({
+          error: "The link has expired.",
+        });
+      }
+
+      const { name, email, password } = jwt.decode(token);
+
+      const newUser = new User({ name, email, password });
+
+      User.findOne({ email }).exec((err, user) => {
+        if (err) {
+          return res.status(400).json({
+            error: "Something went error.",
+          });
+        }
+
+        if (user) {
+          return res.status(400).json({
+            error: "The account has already been activated.",
+          });
+        }
+
+        newUser.save((err, userData) => {
+          if (err) {
+            return res.status(400).json({
+              error: "Something went error.",
+            });
+          }
+
+          res.json({
+            message: `Hey ${name}, welcome to the app!!`,
+          });
+        });
+      });
+    });
+  }
+
+  return res.status(401).json({
+    error: "The token is invalid",
+  });
+};
+
+exports.signIn = (__, res) => res.json({ welcome: "Sign In" });
