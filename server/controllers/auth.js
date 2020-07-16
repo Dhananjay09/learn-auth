@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const _ = require("lodash");
 const User = require("../models/auth");
 
 const transport = nodemailer.createTransport({
@@ -127,4 +128,140 @@ exports.activateAccount = (req, res) => {
   });
 };
 
-exports.signIn = (__, res) => res.json({ welcome: "Sign In" });
+exports.signIn = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email }).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
+        error: "User with the email specified doesn't exist.",
+      });
+    }
+
+    if (!user.authenticate(password)) {
+      return res.status(400).json({
+        error: "Password is incorrect",
+      });
+    }
+
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    const { _id, name, role, email } = user;
+
+    return res.json({
+      token,
+      user: {
+        _id,
+        name,
+        role,
+        email,
+      },
+      message: "Signed in successfully",
+    });
+  });
+};
+
+exports.forgotPassword = (req, res) => {
+  const { email } = req.body;
+
+  User.findOne({ email }).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
+        error: "User doesn't exist.",
+      });
+    }
+
+    const token = jwt.sign(
+      { _id: user._id, name: user.name },
+      process.env.JWT_RESET_PASSWORD,
+      {
+        expiresIn: "10m",
+      }
+    );
+
+    const link = `${process.env.CLIENT_URL}/auth/password/reset/${token}`;
+
+    const emailData = {
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Password Reset Link",
+      html: `
+        <h1>Please use the following link to reset your password:</h1>
+
+        <a href="${link}" target="_blank">${link}</a>
+      `,
+    };
+
+    return user.updateOne({ resetPasswordLink: token }).exec((err, success) => {
+      if (err) {
+        return res.status(400).json({
+          error: "There was an error in saving the reset password link",
+        });
+      }
+
+      transport
+        .sendMail(emailData)
+        .then(() => {
+          return res.json({
+            message: `Email has been successfully sent to ${email}`,
+          });
+        })
+        .catch((err) => {
+          return res.status(400).json({
+            error: "There was an error in sending the email.",
+          });
+        });
+    });
+  });
+};
+
+exports.resetPassword = (req, res) => {
+  const { resetPasswordLink, newPassword } = req.body;
+
+  if (resetPasswordLink) {
+    return jwt.verify(
+      resetPasswordLink,
+      process.env.JWT_RESET_PASSWORD,
+      (err) => {
+        if (err) {
+          return res.status(400).json({
+            error: "Expired link. Try again.",
+          });
+        }
+
+        User.findOne({ resetPasswordLink }).exec((err, user) => {
+          if (err || !user) {
+            return res.status(400).json({
+              error: "Somethig went wrong. Try later",
+            });
+          }
+
+          const updateFields = {
+            password: newPassword,
+            resetPasswordLink: "",
+          };
+
+          user = _.extend(user, updateFields);
+
+          user.save((err) => {
+            if (err) {
+              return res.status(400).json({
+                error: "error in resetting the password",
+              });
+            }
+
+            return res.json({
+              message: "Great! The password has reset.",
+            });
+          });
+        });
+      }
+    );
+  }
+
+  return res.status(400).json({
+    error: "We have not received the reset password link",
+  });
+};
