@@ -17,8 +17,9 @@ axios.interceptors.response.use(null, (error) => {
     signout(() => {
       window.location.href = "/";
     });
-    return Promise.reject(error);
   }
+
+  return Promise.reject(error);
 });
 
 function App() {
