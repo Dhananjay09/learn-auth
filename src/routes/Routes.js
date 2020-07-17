@@ -1,11 +1,11 @@
 import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Signup from "./components/Signup";
-import Signin from "./components/Signin";
-import Activate from "./components/Activate";
-import Forgot from "./components/Forgot";
-import Reset from "./components/Reset";
+import Home from "../components/Home";
+import Signup from "../components/Signup";
+import Signin from "../components/Signin";
+import Activate from "../components/Activate";
+import Forgot from "../components/Forgot";
+import Reset from "../components/Reset";
 
 const Routes = () => {
   return (

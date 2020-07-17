@@ -4,7 +4,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const { authorize } = require("./middlewares/auth");
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/users");
 
 const { NODE_PORT, NODE_ENV, DATABASE_URL } = process.env;
 const PORT = NODE_PORT || 8000;
@@ -32,6 +34,7 @@ if (isDevelopment) {
 }
 
 app.use("/api", authRoutes);
+app.use("/api/users", authorize, userRoutes);
 
 mongoose
   .connect(DATABASE_URL, {
