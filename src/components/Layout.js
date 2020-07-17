@@ -18,9 +18,8 @@ const Layout = ({ children, match, history }) => {
           Home
         </Link>
       </li>
-
       {!isAuth() && (
-        <Fragment>
+        <>
           <li className="nav-item">
             <Link to="/signin" className="nav-link" style={isActive("/signin")}>
               Signin
@@ -31,23 +30,35 @@ const Layout = ({ children, match, history }) => {
               Signup
             </Link>
           </li>
-        </Fragment>
+        </>
       )}
 
       {isAuth() && (
-        <li className="nav-item">
-          <span
-            className="nav-link"
-            style={{ cursor: "pointer", color: "#fff" }}
-            onClick={() => {
-              signout(() => {
-                history.push("/");
-              });
-            }}
-          >
-            Signout
-          </span>
-        </li>
+        <>
+          <li className="nav-item">
+            <Link
+              to="/dashboard"
+              className="nav-link"
+              style={isActive("/dashboard")}
+            >
+              Dashboard
+            </Link>
+          </li>
+
+          <li className="nav-item">
+            <span
+              className="nav-link"
+              style={{ cursor: "pointer", color: "#fff" }}
+              onClick={() => {
+                signout(() => {
+                  history.push("/");
+                });
+              }}
+            >
+              Signout
+            </span>
+          </li>
+        </>
       )}
     </ul>
   );

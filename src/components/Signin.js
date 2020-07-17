@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { authenticate, isAuth } from "../utils/helpers";
 import Layout from "./Layout";
@@ -42,7 +42,7 @@ const Signin = ({ history }) => {
             buttonText: "Submitted",
           });
           // toast.success(`Hey ${response.data.user.name}, Welcome back!`);
-          isAuth() ? history.push("/") : history.push("/signin");
+          isAuth() ? history.push("/dashboard") : history.push("/signin");
         });
       })
       .catch((err) => {
@@ -97,7 +97,6 @@ const Signin = ({ history }) => {
     <Layout>
       <div className="col-md-6 offset-md-3">
         <ToastContainer />
-        {isAuth() ? <Redirect to="/" /> : null}
         <h1 className="p-5 text-center">Signin</h1>
         {signinForm()}
         <br />
