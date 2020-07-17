@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import Layout from "./Layout";
@@ -6,7 +6,7 @@ import Layout from "./Layout";
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
+  const makeApiCall = useCallback(() => {
     axios
       .get("users/list-users")
       .then((res) => {
@@ -21,6 +21,10 @@ const Dashboard = () => {
       });
   }, []);
 
+  useEffect(() => {
+    makeApiCall();
+  }, [makeApiCall]);
+
   return (
     <Layout>
       <div className="col-md-6 offset-md-3">
@@ -33,6 +37,10 @@ const Dashboard = () => {
             users.map((user) => <li key={user._id}>{user.name}</li>)
           )}
         </ul>
+
+        <button className="btn btn-primary" onClick={makeApiCall}>
+          Make API Call
+        </button>
       </div>
     </Layout>
   );

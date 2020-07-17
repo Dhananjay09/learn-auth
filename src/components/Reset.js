@@ -32,7 +32,7 @@ const Reset = ({ match }) => {
     event.preventDefault();
     setValues({ ...values, buttonText: "Submitting" });
     axios
-      .put("/reset-password", { newPassword, resetPasswordLink: token })
+      .post("/reset-password", { newPassword, resetPasswordLink: token })
       .then((response) => {
         console.log("RESET PASSWORD SUCCESS", response);
         toast.success(response.data.message);

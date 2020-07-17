@@ -22,7 +22,7 @@ const Forgot = ({ history }) => {
     event.preventDefault();
     setValues({ ...values, buttonText: "Submitting" });
     axios
-      .put("forgot-password", { email })
+      .post("forgot-password", { email })
       .then((response) => {
         console.log("FORGOT PASSWORD SUCCESS", response);
         toast.success(response.data.message);
