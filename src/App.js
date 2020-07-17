@@ -15,7 +15,7 @@ axios.interceptors.request.use((config) => {
 axios.interceptors.response.use(null, (error) => {
   if (error.response.status === 401) {
     signout(() => {
-      window.location("/");
+      window.location.href = "/";
     });
     return Promise.reject(error);
   }
