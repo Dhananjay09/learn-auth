@@ -1,4 +1,4 @@
-const app = require("express")();
+const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -7,6 +7,9 @@ require("dotenv").config();
 const { authorize } = require("./middlewares/auth");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
+const imageRoutes = require("./routes/image");
+
+const app = express();
 
 const { NODE_PORT, NODE_ENV, DATABASE_URL } = process.env;
 const PORT = NODE_PORT || 8000;
@@ -33,8 +36,12 @@ if (isDevelopment) {
   app.use(cors());
 }
 
+// In case frontend is being rendered from nodejs
+app.use("/uploads", express.static("uploads"));
+
 app.use("/api", authRoutes);
 app.use("/api/users", authorize, userRoutes);
+app.use("/api/file", imageRoutes);
 
 mongoose
   .connect(DATABASE_URL, {
