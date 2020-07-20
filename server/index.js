@@ -45,9 +45,7 @@ mongoose
   })
   .then(() => {
     app.listen(PORT, () => {
-      console.log(
-        `DB connected and the server is runnning at ${PORT}-${NODE_ENV}`
-      );
+      console.log(`DB connected and the server is runnning at ${PORT}-${NODE_ENV}`);
     });
   })
   .catch((err) => {

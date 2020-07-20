@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const _ = require("lodash");
 const User = require("../models/auth");
+const Logger = require("../utils/logger");
+
+const AuthLogger = new Logger("users");
 
 const transport = nodemailer.createTransport({
   host: "smtp.mailtrap.io",
@@ -28,11 +31,9 @@ exports.signUp = (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      { name, email, password },
-      process.env.JWT_ACCOUNT_ACTIVATION,
-      { expiresIn: "10m" }
-    );
+    const token = jwt.sign({ name, email, password }, process.env.JWT_ACCOUNT_ACTIVATION, {
+      expiresIn: "10m",
+    });
 
     const activateLink = `${process.env.CLIENT_URL}/auth/activate/${token}`;
 
@@ -131,8 +132,13 @@ exports.activateAccount = (req, res) => {
 exports.signIn = (req, res) => {
   const { email, password } = req.body;
 
+  AuthLogger.setLogData(req.body);
+  AuthLogger.info("Request recieved at auth/signin", req.body);
+
   User.findOne({ email }).exec((err, user) => {
     if (err || !user) {
+      AuthLogger.error("User with the email specified doesn't exist.");
+
       return res.status(400).json({
         error: "User with the email specified doesn't exist.",
       });
@@ -173,13 +179,9 @@ exports.forgotPassword = (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      { _id: user._id, name: user.name },
-      process.env.JWT_RESET_PASSWORD,
-      {
-        expiresIn: "10m",
-      }
-    );
+    const token = jwt.sign({ _id: user._id, name: user.name }, process.env.JWT_RESET_PASSWORD, {
+      expiresIn: "10m",
+    });
 
     const link = `${process.env.CLIENT_URL}/auth/password/reset/${token}`;
 
@@ -221,44 +223,40 @@ exports.resetPassword = (req, res) => {
   const { resetPasswordLink, newPassword } = req.body;
 
   if (resetPasswordLink) {
-    return jwt.verify(
-      resetPasswordLink,
-      process.env.JWT_RESET_PASSWORD,
-      (err) => {
-        if (err) {
+    return jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, (err) => {
+      if (err) {
+        return res.status(400).json({
+          error: "Expired link. Try again.",
+        });
+      }
+
+      User.findOne({ resetPasswordLink }).exec((err, user) => {
+        if (err || !user) {
           return res.status(400).json({
-            error: "Expired link. Try again.",
+            error: "Somethig went wrong. Try later",
           });
         }
 
-        User.findOne({ resetPasswordLink }).exec((err, user) => {
-          if (err || !user) {
+        const updateFields = {
+          password: newPassword,
+          resetPasswordLink: "",
+        };
+
+        user = _.extend(user, updateFields);
+
+        user.save((err) => {
+          if (err) {
             return res.status(400).json({
-              error: "Somethig went wrong. Try later",
+              error: "error in resetting the password",
             });
           }
 
-          const updateFields = {
-            password: newPassword,
-            resetPasswordLink: "",
-          };
-
-          user = _.extend(user, updateFields);
-
-          user.save((err) => {
-            if (err) {
-              return res.status(400).json({
-                error: "error in resetting the password",
-              });
-            }
-
-            return res.json({
-              message: "Great! The password has reset.",
-            });
+          return res.json({
+            message: "Great! The password has reset.",
           });
         });
-      }
-    );
+      });
+    });
   }
 
   return res.status(400).json({
