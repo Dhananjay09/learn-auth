@@ -5,6 +5,7 @@ import Layout from "./Layout";
 
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
+  const [fileUpload, setFileUpload] = useState();
 
   const makeApiCall = useCallback(() => {
     axios
@@ -20,6 +21,31 @@ const Dashboard = () => {
         }
       });
   }, []);
+
+  const onChangeHandler = useCallback((event) => {
+    setFileUpload(event.target.files[0]);
+  }, []);
+
+  const uploadImage = useCallback(() => {
+    const data = new FormData();
+    data.append("myImage", fileUpload);
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+
+    axios
+      .post("file/image-upload", data, config)
+      .then((res) => {
+        console.log("IMAGE UPLOAD SUCCESS!!", res);
+      })
+      .catch((err) => {
+        if (err && err.response && err.response.data) {
+          toast.error(err.response.data.error);
+        }
+      });
+  }, [fileUpload]);
 
   useEffect(() => {
     makeApiCall();
@@ -41,6 +67,13 @@ const Dashboard = () => {
         <button className="btn btn-primary" onClick={makeApiCall}>
           Make API Call
         </button>
+
+        <form>
+          <input type="file" name="file" onChange={onChangeHandler} />
+          <button type="button" className="btn btn-primary" onClick={uploadImage}>
+            Upload
+          </button>
+        </form>
       </div>
     </Layout>
   );
