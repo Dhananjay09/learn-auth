@@ -60,7 +60,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 
 - Goto [Heroku Dev center](https://devcenter.heroku.com/articles/heroku-cli)
 - Follow the instructions to install Heroku cli for your respective OS
--
+- Run `heroku create` for creating an heroku instance from the root project folder
 
 ### `yarn build` fails to minify
 
