@@ -39,6 +39,7 @@ if (isDevelopment) {
 
 // In case frontend is being rendered from nodejs
 app.use("/uploads", express.static("uploads"));
+app.use(express.static(path.join(__dirname, "/client/build")));
 
 app.use("/api", authRoutes);
 app.use("/api/users", authorize, userRoutes);
