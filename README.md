@@ -61,6 +61,20 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 - Goto [Heroku Dev center](https://devcenter.heroku.com/articles/heroku-cli)
 - Follow the instructions to install Heroku cli for your respective OS
 - Run `heroku create` for creating an heroku instance from the root project folder
+- Create React App will proxy API requests from the React app to the Express app if we add a “proxy” key in _client/package.json_ like this: `"proxy": "http://localhost:8000"`
+- Add this in server/index.js after all the apis have been configured
+
+```js
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname + "/client/build/index.html"));
+});
+```
+
+- Add `"heroku-postbuild": "cd client && yarn && yarn run build"` to the package.json of the express server. It tells heroku to build the production version of our client app
+- Now, push all your code to your preferred cloud e.g Github. The working directory should be clean
+- Run `git push heroku master`
 
 ### `yarn build` fails to minify
 
