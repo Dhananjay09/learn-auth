@@ -74,6 +74,18 @@ app.get("*", (req, res) => {
 
 - Add `"heroku-postbuild": "cd client && yarn && yarn run build"` to the package.json of the express server. It tells heroku to build the production version of our client app
 - Now, push all your code to your preferred cloud e.g Github. The working directory should be clean
+- Goto https://cloud.mongodb.com/v2#/preferences/organizations. Sign up if you don't have an account and then sign in
+- Create an organization. Click next and then on the next page, set everythig be set to default. Click next
+- Create a new project
+- Provide a name you have given in your application for the db name.
+- Click o build clusters
+- Create a cluster. Free cluster
+- Choose AWS. Region: Mumbai
+- It'l take some time to create the cluster. Then click connect.
+- Whitelist your IP and add credenntials
+- Create a connection method
+- Click connect to app and copy the URL. Replace password placeholder with the password in the URL. _Please note_ that if your password has special characters, then encode it by [URL Encoder](https://www.urlencoder.org/)
+- Goto heroku dashboard => Settings => Config vars and add all your environment variables
 - Run `git push heroku master`
 
 ### `yarn build` fails to minify

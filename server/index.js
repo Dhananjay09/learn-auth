@@ -12,7 +12,7 @@ const imageRoutes = require("./routes/image");
 const app = express();
 
 const { NODE_PORT, NODE_ENV, DATABASE_URL } = process.env;
-const PORT = NODE_PORT || 8000;
+const PORT = process.env.PORT || NODE_PORT || 8000;
 
 const isDevelopment = NODE_ENV === "development";
 
