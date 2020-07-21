@@ -5,10 +5,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const { authorize } = require("./middlewares/auth");
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/users");
-const imageRoutes = require("./routes/image");
+const { authorize } = require("./server/middlewares/auth");
+const authRoutes = require("./server/routes/auth");
+const userRoutes = require("./server/routes/users");
+const imageRoutes = require("./server/routes/image");
 
 const app = express();
 
@@ -47,7 +47,7 @@ app.use("/api/file", imageRoutes);
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname + "../client/build/index.html"));
+  res.sendFile(path.join(__dirname + "/client/build/index.html"));
 });
 
 mongoose
